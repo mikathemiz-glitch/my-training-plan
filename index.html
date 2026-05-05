@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>12-Week Training Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F5F0;
+  --surface: #FFFFFF;
+  --surface2: #F0EDE6;
+  --border: #E2DDD5;
+  --border2: #C8C2B8;
+  --text: #1A1814;
+  --text2: #6B6560;
+  --text3: #9E9890;
+  --teal: #1D9E75;
+  --teal-light: #E1F5EE;
+  --teal-dark: #0F6E56;
+  --blue: #2D6FBF;
+  --blue-light: #E8F0FB;
+  --amber: #B87333;
+  --amber-light: #FBF0E0;
+  --coral: #C0533A;
+  --coral-light: #FBECE8;
+  --purple: #6B4FBB;
+  --purple-light: #EEEAFB;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:80px}
+
+.nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px 8px;cursor:pointer;border:none;background:none;color:var(--text3);font-family:'DM Sans',sans-serif;font-size:10px;font-weight:500;letter-spacing:0.03em;transition:color 0.15s}
+.nav-btn.active{color:var(--teal)}
+.nav-btn svg{width:22px;height:22px}
+
+.page{display:none;padding-bottom:1rem}
+.page.active{display:block}
+
+.page-header{padding:1.2rem 1rem 0.8rem;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:10}
+.page-header h1{font-size:20px;font-weight:600;color:var(--text)}
+.page-header p{font-size:12px;color:var(--text2);margin-top:2px}
+
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin:0 1rem 10px;box-shadow:var(--shadow)}
+.sect{padding:12px 1rem 6px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em}
+
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:12px 1rem}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px;text-align:center}
+.stat-val{font-size:20px;font-weight:600;color:var(--text);font-family:'DM Mono',monospace}
+.stat-lbl{font-size:10px;color:var(--text3);margin-top:2px;line-height:1.3}
+
+/* WEEK TRACKER */
+.week-row{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
+.week-row:last-child{border-bottom:none}
+.week-num{font-size:12px;font-weight:600;color:var(--text);min-width:48px}
+.week-phase{font-size:10px;padding:2px 7px;border-radius:99px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;min-width:72px;text-align:center}
+.phase-1{background:var(--teal-light);color:var(--teal-dark)}
+.phase-2{background:var(--blue-light);color:var(--blue)}
+.phase-3{background:var(--purple-light);color:var(--purple)}
+.week-days{display:flex;gap:4px;flex:1}
+.day-dot{width:28px;height:28px;border-radius:6px;border:1.5px solid var(--border2);background:var(--surface);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:var(--text3);transition:all 0.15s;flex-shrink:0}
+.day-dot.done{background:var(--teal);border-color:var(--teal);color:white}
+.day-dot.done::after{content:'✓';font-size:11px}
+.day-dot:not(.done){font-size:8px}
+.day-dot.rest-dot{background:var(--surface2);border-color:var(--border);color:var(--text3);cursor:default}
+.day-dot.cardio-dot.done{background:var(--blue);border-color:var(--blue)}
+.week-pct{font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);min-width:32px;text-align:right}
+
+/* PHASE TABS */
+.phase-tabs{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.phase-tab{font-size:12px;padding:6px 14px;border-radius:99px;border:1px solid var(--border);background:transparent;cursor:pointer;color:var(--text2);font-family:'DM Sans',sans-serif;font-weight:500;transition:all 0.15s}
+.phase-tab.active{border-color:transparent;font-weight:600}
+.phase-tab-1.active{background:var(--teal-light);color:var(--teal-dark)}
+.phase-tab-2.active{background:var(--blue-light);color:var(--blue)}
+.phase-tab-3.active{background:var(--purple-light);color:var(--purple)}
+
+/* SESSION CARDS */
+.session-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+.ex-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)}
+.ex-row:last-child{border-bottom:none}
+.ex-num{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;margin-top:1px}
+.ex-name{font-size:13px;font-weight:600;color:var(--text);line-height:1.3}
+.ex-detail{font-size:11px;color:var(--blue);font-family:'DM Mono',monospace;margin-top:1px}
+.ex-note{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.4}
+.elbow-tag{font-size:9px;font-weight:600;background:var(--amber-light);color:var(--amber);padding:1px 6px;border-radius:99px;text-transform:uppercase;letter-spacing:0.05em;display:inline-block;margin-top:3px}
+
+/* CARDIO SECTION */
+.cardio-row{display:flex;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);align-items:flex-start}
+.cardio-row:last-child{border-bottom:none}
+.cardio-bar{width:3px;border-radius:2px;align-self:stretch;flex-shrink:0;min-height:30px;background:var(--blue)}
+.cardio-phase{font-size:12px;font-weight:600;color:var(--text);min-width:64px}
+.cardio-desc{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* ELBOW BANNER */
+.elbow-banner{background:var(--amber-light);border:1px solid #EFC97A;border-radius:var(--radius);padding:12px 14px;margin:0 1rem 10px;display:flex;gap:10px;align-items:flex-start}
+.elbow-banner-text{font-size:12px;color:#7A4A0A;line-height:1.5}
+
+.btn{font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;padding:9px 16px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer}
+.btn-teal{background:var(--teal);border-color:var(--teal);color:white}
+.progress-bar-bg{height:5px;background:var(--border);border-radius:99px;margin:8px 0 4px}
+.progress-bar-fill{height:5px;border-radius:99px;background:var(--teal);transition:width 0.4s}
+</style>
+</head>
+<body>
+
+<!-- TRACKER PAGE -->
+<div class="page active" id="page-tracker">
+  <div class="page-header">
+    <h1>12-Week Tracker</h1>
+    <p>Kettlebell + Cardio Plan</p>
+  </div>
+  <div class="stats-row" id="trackerStats"></div>
+  <div class="elbow-banner">
+    <span style="font-size:16px">⚠</span>
+    <div class="elbow-banner-text">Wks 1–4: avoid deep elbow flexion. Exercises marked <b>elbow care</b> — reduce load or skip if pain above 2/10. Saturday mobility includes forearm stretching.</div>
+  </div>
+  <div class="sect">Tap a session to mark it done</div>
+  <div class="card" id="weekRows"></div>
+</div>
+
+<!-- SESSIONS PAGE -->
+<div class="page" id="page-sessions">
+  <div class="page-header">
+    <h1>Sessions</h1>
+    <p>All exercises by phase</p>
+  </div>
+  <div style="padding:12px 1rem 0">
+    <div class="phase-tabs">
+      <button class="phase-tab phase-tab-1 active" onclick="setPhase(1,this)">Phase 1</button>
+      <button class="phase-tab phase-tab-2" onclick="setPhase(2,this)">Phase 2</button>
+      <button class="phase-tab phase-tab-3" onclick="setPhase(3,this)">Phase 3</button>
+    </div>
+  </div>
+  <div id="sessionsContent"></div>
+</div>
+
+<!-- CARDIO PAGE -->
+<div class="page" id="page-cardio">
+  <div class="page-header">
+    <h1>Cardio</h1>
+    <p>Tue · Thu · Sat — 15:30 to 16:00</p>
+  </div>
+  <div class="sect">Progression plan</div>
+  <div class="card">
+    <div class="cardio-row">
+      <div class="cardio-bar" style="background:var(--teal)"></div>
+      <div>
+        <div class="cardio-phase">Wks 1–4</div>
+        <div class="cardio-desc">Walk the full 4 km at a brisk pace. No running yet. Build the base.</div>
+      </div>
+    </div>
+    <div class="cardio-row">
+      <div class="cardio-bar" style="background:var(--blue)"></div>
+      <div>
+        <div class="cardio-phase">Wks 5–8</div>
+        <div class="cardio-desc">Intervals: 1 min run / 2 min walk. Repeat for the full 4 km.</div>
+      </div>
+    </div>
+    <div class="cardio-row">
+      <div class="cardio-bar" style="background:var(--purple)"></div>
+      <div>
+        <div class="cardio-phase">Wks 9–12</div>
+        <div class="cardio-desc">2 min run / 1 min walk → aim to run the full 4 km continuously by week 12.</div>
+      </div>
+    </div>
+  </div>
+  <div class="sect">Saturday mobility (after cardio)</div>
+  <div class="card">
+    <div class="cardio-row">
+      <div class="cardio-bar" style="background:var(--teal)"></div>
+      <div><div class="cardio-phase" style="min-width:unset">Hip flexor stretch</div><div class="cardio-desc">60 sec each side — low lunge position</div></div>
+    </div>
+    <div class="cardio-row">
+      <div class="cardio-bar" style="background:var(--teal)"></div>
+      <div><div class="cardio-phase" style="min-width:unset">Thoracic rotation</div><div class="cardio-desc">10 reps each side — seated or kneeling</div></div>
+    </div>
+    <div class="cardio-row">
+      <div class="cardio-bar" style="background:var(--amber)"></div>
+      <div><div class="cardio-phase" style="min-width:unset">Forearm / wrist stretch</div><div class="cardio-desc">60 sec each — gentle flexion/extension. Supports elbow rehab.</div></div>
+    </div>
+    <div class="cardio-row">
+      <div class="cardio-bar" style="background:var(--teal)"></div>
+      <div><div class="cardio-phase" style="min-width:unset">Shoulder circles</div><div class="cardio-desc">30 sec each direction — forward then backward</div></div>
+    </div>
+    <div class="cardio-row">
+      <div class="cardio-bar" style="background:var(--teal)"></div>
+      <div><div class="cardio-phase" style="min-width:unset">Chest opener</div><div class="cardio-desc">30 sec — clasp hands behind back, open chest</div></div>
+    </div>
+  </div>
+  <div class="sect">Session structure</div>
+  <div class="card">
+    <div class="cardio-row">
+      <div class="cardio-bar" style="background:var(--text3)"></div>
+      <div><div class="cardio-phase" style="min-width:unset">05:00 – 05:20</div><div class="cardio-desc">Kettlebell session (Mon / Wed / Fri)</div></div>
+    </div>
+    <div class="cardio-row">
+      <div class="cardio-bar" style="background:var(--blue)"></div>
+      <div><div class="cardio-phase" style="min-width:unset">15:30 – 16:00</div><div class="cardio-desc">Cardio 4 km (Tue / Thu / Sat)</div></div>
+    </div>
+    <div class="cardio-row">
+      <div class="cardio-bar" style="background:var(--text3)"></div>
+      <div><div class="cardio-phase" style="min-width:unset">Sunday</div><div class="cardio-desc">Full rest — light walking or gentle stretching only</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showPage('tracker',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    <span>Tracker</span>
+  </button>
+  <button class="nav-btn" onclick="showPage('sessions',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+    <span>Sessions</span>
+  </button>
+  <button class="nav-btn" onclick="showPage('cardio',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    <span>Cardio</span>
+  </button>
+</nav>
+
+<script>
+const STORAGE_KEY = 'training_plan_v1';
+let state = { sessions: {} };
+try { const d = localStorage.getItem(STORAGE_KEY); if(d) state = JSON.parse(d); } catch(e) {}
+function save() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e) {} }
+
+// ── DATA ──────────────────────────────────────────────────────────────
+const PHASES = [
+  { label: 'Phase 1 — Wks 1–4', sub: 'Foundation: learn movement patterns. 2×10 kg throughout. Rest 45–60 sec.', cls: 'phase-1', numCls: 'sn-teal',
+    A: [
+      { name:'Deadlift (2×10 kg)', detail:'3 sets × 10 reps', note:'Hinge from hips, neutral spine', elbow:false },
+      { name:'Goblet squat (1×12 kg)', detail:'3 sets × 8 reps', note:'Hold by horns at chest', elbow:false },
+      { name:'Two-hand swing (2×10 kg)', detail:'3 sets × 8 reps', note:'Drive with hips, not arms', elbow:false },
+      { name:'Plank', detail:'3 sets × 20 sec', note:'Elbows on floor — low elbow stress', elbow:false },
+      { name:'Farmer carry (2×10 kg)', detail:'2 × 20 m', note:'Tall posture, grip work', elbow:false },
+    ],
+    B: [
+      { name:'Single-leg deadlift (1×10 kg)', detail:'3 sets × 6 reps each', note:'Balance and posterior chain', elbow:false },
+      { name:'Push-up (bodyweight)', detail:'3 sets × 8 reps', note:'No deep lock-out yet', elbow:true },
+      { name:'Hip hinge row (1×10 kg)', detail:'3 sets × 8 reps each', note:'Bend at hip, row to hip — limited range', elbow:true },
+      { name:'Dead bug', detail:'3 sets × 6 reps each side', note:'Core stability, zero elbow stress', elbow:false },
+      { name:'Two-hand swing (2×10 kg)', detail:'2 sets × 10 reps', note:'End-of-session conditioning', elbow:false },
+    ]
+  },
+  { label: 'Phase 2 — Wks 5–8', sub: 'Build: increase volume, single-arm work, introduce 12 kg. Rest 40–50 sec.', cls: 'phase-2', numCls: 'sn-blue',
+    A: [
+      { name:'Single-arm deadlift (1×12 kg)', detail:'3 sets × 8 reps each', note:'Challenges anti-rotation', elbow:false },
+      { name:'Goblet squat (1×12 kg)', detail:'4 sets × 10 reps', note:'Increase depth progressively', elbow:false },
+      { name:'Two-hand swing (2×10 kg)', detail:'4 sets × 10 reps', note:'Add power intent', elbow:false },
+      { name:'Single-arm row (1×10 kg)', detail:'3 sets × 8 reps each', note:'Monitor elbow at ~90°, stop if pain', elbow:true },
+      { name:'Farmer carry (2×10 kg)', detail:'3 × 25 m', note:'Increase distance', elbow:false },
+    ],
+    B: [
+      { name:'Goblet squat to press (1×10 kg)', detail:'3 sets × 6 reps', note:'Press to overhead — check elbow comfort', elbow:true },
+      { name:'Push-up (bodyweight)', detail:'3 sets × 10 reps', note:'Full range now if pain-free', elbow:false },
+      { name:'Single-arm swing (1×10 kg)', detail:'3 sets × 8 reps each', note:'Elbow stays relatively extended', elbow:false },
+      { name:'Dead bug + KB hold (1×10 kg)', detail:'3 sets × 5 reps each', note:'Arm extended — low elbow demand', elbow:true },
+      { name:'Overhead carry (1×10 kg)', detail:'2 × 20 m each', note:'Only if shoulder stable; elbow extended', elbow:true },
+    ]
+  },
+  { label: 'Phase 3 — Wks 9–12', sub: 'Progress: heavier loads, double KB, run intervals. Rest 30–40 sec.', cls: 'phase-3', numCls: 'sn-purple',
+    A: [
+      { name:'Double KB deadlift (2×12 kg)', detail:'4 sets × 8 reps', note:'Heavier load, same technique', elbow:false },
+      { name:'Goblet squat (1×12 kg)', detail:'4 sets × 12 reps', note:'Controlled tempo', elbow:false },
+      { name:'Double swing (2×10 kg)', detail:'4 sets × 12 reps', note:'Explosive hip drive', elbow:false },
+      { name:'Single-arm row (1×12 kg)', detail:'3 sets × 10 reps each', note:'Only if elbow fully pain-free', elbow:true },
+      { name:'Farmer carry (2×12 kg)', detail:'3 × 30 m', note:'Heavier carry for grip and core', elbow:false },
+    ],
+    B: [
+      { name:'KB clean alternating (1×10 kg)', detail:'3 sets × 6 reps each', note:'Hip-driven catch — monitor elbow', elbow:true },
+      { name:'Push-up (bodyweight)', detail:'4 sets × 12 reps', note:'Add pause at bottom if easy', elbow:false },
+      { name:'Double KB swing (2×10 kg)', detail:'3 sets × 12 reps', note:'Power conditioning', elbow:false },
+      { name:'Side plank', detail:'3 × 25 sec each', note:'Elbow version OK — low joint stress', elbow:false },
+      { name:'Overhead carry (1×10 kg)', detail:'3 × 20 m each', note:'Core and shoulder stability', elbow:false },
+    ]
+  }
+];
+
+// Week structure: Mon=KB-A, Tue=Cardio, Wed=KB-B, Thu=Cardio, Fri=KB-A, Sat=Cardio, Sun=Rest
+const WEEK_DAYS = [
+  { label:'Mon', type:'kb', tag:'KB-A' },
+  { label:'Tue', type:'cardio', tag:'Cardio' },
+  { label:'Wed', type:'kb', tag:'KB-B' },
+  { label:'Thu', type:'cardio', tag:'Cardio' },
+  { label:'Fri', type:'kb', tag:'KB-A' },
+  { label:'Sat', type:'cardio', tag:'C+Mob' },
+  { label:'Sun', type:'rest', tag:'Rest' },
+];
+
+// ── PAGE NAV ──────────────────────────────────────────────────────────
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  btn.classList.add('active');
+  if(name==='tracker') renderTracker();
+  if(name==='sessions') renderSessions();
+}
+window.showPage=showPage;
+
+// ── TRACKER ───────────────────────────────────────────────────────────
+function sessionKey(week, day) { return `w${week}_d${day}`; }
+
+function toggleSession(week, day) {
+  const k = sessionKey(week, day);
+  state.sessions[k] = !state.sessions[k];
+  save(); renderTracker();
+}
+window.toggleSession = toggleSession;
+
+function renderTracker() {
+  // stats
+  let total=0, done=0, kbDone=0, cardioDone=0;
+  for(let w=1;w<=12;w++) {
+    WEEK_DAYS.forEach((d,di) => {
+      if(d.type==='rest') return;
+      total++;
+      const k=sessionKey(w,di);
+      if(state.sessions[k]) {
+        done++;
+        if(d.type==='kb') kbDone++;
+        if(d.type==='cardio') cardioDone++;
+      }
+    });
+  }
+  const pct = total ? Math.round(done/total*100) : 0;
+  document.getElementById('trackerStats').innerHTML=`
+    <div class="stat"><div class="stat-val">${done}</div><div class="stat-lbl">Sessions done</div></div>
+    <div class="stat"><div class="stat-val">${pct}%</div><div class="stat-lbl">Complete</div></div>
+    <div class="stat"><div class="stat-val">${kbDone}</div><div class="stat-lbl">KB sessions</div></div>
+    <div class="stat"><div class="stat-val">${cardioDone}</div><div class="stat-lbl">Cardio runs</div></div>
+  `;
+
+  // week rows
+  let html = '';
+  for(let w=1;w<=12;w++) {
+    const phaseIdx = w<=4?0:w<=8?1:2;
+    const ph = PHASES[phaseIdx];
+    let weekDone=0, weekTotal=0;
+    WEEK_DAYS.forEach((d,di)=>{ if(d.type!=='rest'){weekTotal++; if(state.sessions[sessionKey(w,di)]) weekDone++; }});
+    const wpct = weekTotal ? Math.round(weekDone/weekTotal*100) : 0;
+
+    const dots = WEEK_DAYS.map((d,di) => {
+      if(d.type==='rest') return `<div class="day-dot rest-dot" title="Rest">${d.label}</div>`;
+      const done = state.sessions[sessionKey(w,di)];
+      const cardioClass = d.type==='cardio' ? ' cardio-dot' : '';
+      return `<div class="day-dot${cardioClass}${done?' done':''}" onclick="toggleSession(${w},${di})" title="${d.label} — ${d.tag}">${done?'':'<span style=\'font-size:8px;color:var(--text3)\'>${d.label}</span>'}</div>`;
+    }).join('');
+
+    const phClass = ['phase-1','phase-2','phase-3'][phaseIdx];
+    html += `<div class="week-row">
+      <div class="week-num">Wk ${w}</div>
+      <span class="week-phase ${phClass}">Ph ${phaseIdx+1}</span>
+      <div class="week-days">${dots}</div>
+      <div class="week-pct">${wpct}%</div>
+    </div>`;
+  }
+  document.getElementById('weekRows').innerHTML = html;
+}
+
+// ── SESSIONS ──────────────────────────────────────────────────────────
+let activePhase = 1;
+
+function setPhase(p, btn) {
+  activePhase = p;
+  document.querySelectorAll('.phase-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderSessions();
+}
+window.setPhase = setPhase;
+
+function renderSessions() {
+  const ph = PHASES[activePhase-1];
+  const numColors = ['#1D9E75','#2D6FBF','#6B4FBB'];
+  const nc = numColors[activePhase-1];
+
+  function exRows(exs) {
+    return exs.map((ex,i) => `
+      <div class="ex-row">
+        <div class="ex-num" style="background:${nc}22;color:${nc}">${i+1}</div>
+        <div style="flex:1">
+          <div class="ex-name">${ex.name}</div>
+          <div class="ex-detail">${ex.detail}</div>
+          <div class="ex-note">${ex.note}</div>
+          ${ex.elbow ? '<span class="elbow-tag">elbow care</span>' : ''}
+        </div>
+      </div>`).join('');
+  }
+
+  document.getElementById('sessionsContent').innerHTML = `
+    <div style="padding:0 1rem;margin-bottom:4px">
+      <div style="font-size:12px;color:var(--text2);line-height:1.5">${ph.sub}</div>
+    </div>
+    <div class="card">
+      <div class="session-label" style="color:${nc}">Session A — Mon / Fri · 05:00–05:20</div>
+      ${exRows(ph.A)}
+    </div>
+    <div class="card">
+      <div class="session-label" style="color:${nc}">Session B — Wed · 05:00–05:20</div>
+      ${exRows(ph.B)}
+    </div>
+  `;
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────
+renderTracker();
+renderSessions();
+</script>
+</body>
+</html>
